@@ -8,7 +8,7 @@ use self::openssl::pkcs12::Pkcs12;
 use self::openssl::pkey::PKey;
 use self::openssl::ssl::{
     self, MidHandshakeSslStream, SslAcceptor, SslConnector, SslContextBuilder, SslMethod,
-    SslVerifyMode,
+    SslVerifyMode, SslOptions
 };
 use self::openssl::x509::{X509, X509VerifyResult};
 use std::error;
@@ -269,6 +269,9 @@ impl TlsConnector {
                 debug!("add_cert error: {:?}", err);
             }
         }
+
+        let options = connector.options() | SslOptions::DONT_INSERT_EMPTY_FRAGMENTS;
+        connector.set_options(options);
 
         #[cfg(target_os = "android")]
         load_android_root_certs(&mut connector)?;
